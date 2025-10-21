@@ -1,0 +1,19 @@
+# Ultra Deep Research - Python Dependencies
+
+# Core Dependencies
+anthropic>=0.18.0          # Claude API client
+aiohttp>=3.9.0             # Async HTTP client for API calls
+click>=8.1.0               # CLI framework
+python-dotenv>=1.0.0       # Environment variable management
+tqdm>=4.66.0               # Progress bars
+tenacity>=8.2.0            # Retry logic with exponential backoff
+
+# Data Handling
+pydantic>=2.5.0            # Data validation and modeling (optional but recommended)
+
+# Development Dependencies (install with: pip install -r requirements-dev.txt)
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# black>=23.0.0
+# mypy>=1.5.0
+# flake8>=6.1.0
