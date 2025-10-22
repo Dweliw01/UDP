@@ -92,17 +92,10 @@ async def search_single(query: str, session: aiohttp.ClientSession, category: st
                 error_message=None
             )
 
-    except asyncio.TimeoutError:
+    except asyncio.TimeoutError as e:
         logger.error(f"Search timed out for query: {query}")
-        return SearchResult(
-            query=query,
-            response_text="",
-            sources=[],
-            timestamp=datetime.now(),
-            category=category,
-            success=False,
-            error_message="Search timed out"
-        )
+        # Re-raise to trigger retry mechanism
+        raise SearchError(f"Search timed out after {config.search_timeout}s")
     except Exception as e:
         logger.error(f"Search failed for query '{query}': {e}")
         raise SearchError(f"Search failed: {e}")

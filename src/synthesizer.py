@@ -108,15 +108,15 @@ def synthesize_report(aggregated: AggregatedResearch) -> str:
 Key Subtopics: {', '.join(recon.key_subtopics[:5])}
 Key Entities: {', '.join(recon.key_entities[:10])}"""
 
-    # Format results by category
+    # Format results by category (moderate truncation)
     results_text = ""
     for category, results in aggregated.results_by_category.items():
         results_text += f"\n### {category.upper()} ({len(results)} results)\n\n"
-        for i, result in enumerate(results[:10], 1):  # Limit to 10 per category
-            results_text += f"{i}. {result.response_text[:500]}...\n\n"
+        for i, result in enumerate(results[:5], 1):  # Limit to 5 per category (reduced from 10)
+            results_text += f"{i}. {result.response_text[:400]}...\n\n"  # 400 chars (reduced from 500)
 
-    # Format sources
-    source_list = "\n".join(f"- {source}" for source in aggregated.all_sources[:50])
+    # Format sources (reduced to 40)
+    source_list = "\n".join(f"- {source}" for source in aggregated.all_sources[:40])
 
     # Build prompt
     prompt = SYNTHESIS_PROMPT.format(
@@ -131,19 +131,27 @@ Key Entities: {', '.join(recon.key_entities[:10])}"""
         source_count=len(aggregated.all_sources)
     )
 
-    logger.info("Calling Claude Sonnet for synthesis...")
+    logger.info("Calling Claude Sonnet for synthesis (streaming)...")
 
-    # Call Claude Sonnet
-    message = client.messages.create(
+    # Use streaming to prevent connection timeouts
+    report_chunks = []
+
+    with client.messages.stream(
         model=config.synthesis_model,
         max_tokens=4000,
         messages=[{
             "role": "user",
             "content": prompt
         }]
-    )
+    ) as stream:
+        for text in stream.text_stream:
+            report_chunks.append(text)
+            # Print dots to show progress
+            if len(report_chunks) % 50 == 0:
+                print(".", end="", flush=True)
 
-    report = message.content[0].text.strip()
+    print()  # New line after progress dots
+    report = "".join(report_chunks).strip()
 
     logger.info(f"Report generated ({len(report)} chars)")
 

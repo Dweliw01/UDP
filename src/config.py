@@ -16,8 +16,8 @@ class Config:
     perplexity_api_key: str = os.getenv("PERPLEXITY_API_KEY", "")
 
     # Model Configuration
-    query_model: str = "claude-haiku-4-20250514"
-    synthesis_model: str = "claude-sonnet-4-20250514"
+    query_model: str = os.getenv("QUERY_MODEL", "claude-haiku-4-5")
+    synthesis_model: str = os.getenv("SYNTHESIS_MODEL", "claude-sonnet-4-5")
 
     # Search Configuration
     max_concurrent_searches: int = 15

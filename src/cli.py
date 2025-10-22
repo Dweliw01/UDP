@@ -3,6 +3,7 @@
 import click
 import asyncio
 import logging
+import sys
 from pathlib import Path
 from datetime import datetime
 
@@ -12,6 +13,11 @@ from .query_generator import generate_queries
 from .searcher import search_batch
 from .aggregator import aggregate_results
 from .synthesizer import synthesize_report
+
+# Fix encoding for Windows console
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
 
 # Set up logging
 logging.basicConfig(

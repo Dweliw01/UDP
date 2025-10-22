@@ -146,11 +146,15 @@ async def reconnaissance(topic: str) -> ReconnaissanceContext:
 
     # Step 2: Execute the search
     logger.info("Executing overview search...")
-    async with aiohttp.ClientSession() as session:
-        search_result = await search_single(overview_query, session)
+    try:
+        async with aiohttp.ClientSession() as session:
+            search_result = await search_single(overview_query, session)
 
-    if not search_result.success:
-        raise Exception(f"Reconnaissance search failed: {search_result.error_message}")
+        if not search_result.success:
+            raise Exception(f"Reconnaissance search failed: {search_result.error_message}")
+    except Exception as e:
+        logger.error(f"Search failed after retries: {e}")
+        raise Exception(f"Reconnaissance search failed: {str(e)}")
 
     overview_result = search_result.response_text
     logger.info(f"Overview result received ({len(overview_result)} chars)")
